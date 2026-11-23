@@ -31,13 +31,27 @@ iOS
   crashes twice, or after 4 different attempts on the same blocked step.
 - Write everything under `results/<persona>/`. Nothing else.
 
-## What to check (adapt to your app)
-1. First launch and onboarding until the main screen.
+## The app: Where's the Bus (Taiwan public transport)
+Live arrival times for buses, MRT and rail, nearby stops on a map, trip planning,
+favourites. Data covers Taiwan only. UI languages: Traditional Chinese, Simplified
+Chinese, English; any other phone language falls back (judge that fallback).
+There are no accounts and no sign-up: do not look for one.
+- Arrival times are live. "Coming soon" / few minutes away is shown with a colour
+  and weight change, not animation: that is intended.
+- A map that stays blank or grey for more than ~10 s IS a finding (say which screen).
+- Out of scope: push notifications, Live Activities / ongoing notifications, home
+  screen widgets, in-app purchases.
+
+## What to check
+1. First launch, any permission prompt (location, notifications) until the main screen.
+   Grant or deny as your persona would.
 2. The persona's goal (personas.json, `goal`).
-3. Layout on THIS device: cut text, buttons hidden by the keyboard, notch or home bar,
+3. Arrival times: do they look plausible, update, and read clearly (minutes vs clock time)?
+4. Search a stop, a route number and a place; open a stop and a route; go back each time.
+5. Layout on THIS device: cut text, buttons hidden by the keyboard, notch or home bar,
    large text sizes, dark mode contrast.
-4. Error and empty states: no network answer, empty lists, wrong input.
-5. Accessibility: when `screen.py` ends with an `accessibility check` line (controls with no
+6. Error and empty states: no network answer, empty lists, wrong input.
+7. Accessibility: when `screen.py` ends with an `accessibility check` line (controls with no
    name, touch targets under 48 dp / 44 pt), look at those controls on the screenshot. Report
    each kind once, with the screens where you saw it: minor, unless it stops a task.
 

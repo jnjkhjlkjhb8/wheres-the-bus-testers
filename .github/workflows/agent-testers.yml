@@ -10,31 +10,32 @@ on:
     inputs:
       android_personas:
         description: Android personas from personas.json (comma-separated, all = every Android persona, none = skip Android)
-        default: "anna,malik"
+        default: "ahua,kai"
       ios_personas:
         description: iOS personas from personas.json (comma-separated, all = every iOS persona, none = skip iOS)
-        default: "clara,jonas"
+        default: "yuki,xiaomei"
       app_dir:
         description: App folder (where package.json is)
-        default: demo-app
+        default: "."
       app_id:
         description: Android package / iOS bundle id (if a platform uses another id, the one inside its built app is used)
-        default: com.example.tinytodo
+        default: me.rabbitsayhello.wheresthebus
       framework:
         description: auto, flutter, expo, react-native, capacitor, kmp, native or maui
         default: auto
       android_build:
         description: "Custom Android build command or prebuilt download (optional, then set apk_path)"
-        default: ""
+        # Built locally (staging, release-signed) and kept in a private bus-infra prerelease: the public repo can't build the app.
+        default: "gh release download agent-testers-build -R jnjkhjlkjhb8/bus-infra -D prebuilt --clobber -p app.apk"
       apk_path:
         description: Path of the .apk produced by android_build
-        default: ""
+        default: prebuilt/app.apk
       ios_build:
         description: "Custom iOS build command or prebuilt download (optional, then set ios_app_path)"
-        default: ""
+        default: "gh release download agent-testers-build -R jnjkhjlkjhb8/bus-infra -D prebuilt --clobber -p Runner.app.zip && ditto -x -k prebuilt/Runner.app.zip prebuilt"
       ios_app_path:
         description: Path of the Simulator .app produced by ios_build
-        default: ""
+        default: prebuilt/Runner.app
       build_args:
         description: "Extra arguments for the automatic build, both platforms: --dart-define=API_URL=https://... for Flutter, Gradle and xcodebuild arguments for the others. Public on a public repo: put keys in the BUILD_ARGS secret"
         default: ""
@@ -58,7 +59,7 @@ on:
         default: ""
       block_hosts:
         description: Hosts the app must not reach during tests (analytics, ads), space-separated
-        default: "app.posthog.com eu.i.posthog.com us.i.posthog.com graph.facebook.com api.mixpanel.com api2.amplitude.com"
+        default: "app-measurement.com firebaselogging-pa.googleapis.com firebase-settings.crashlytics.com crashlyticsreports-pa.googleapis.com firebaseperusertracking-pa.googleapis.com firebaseremoteconfig.googleapis.com"
       record_video:
         description: Record each phone's screen (encrypted with the results)
         type: boolean
@@ -118,6 +119,7 @@ jobs:
         env:
           APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
           BUILD_COMMAND: ${{ inputs.android_build }}
+          GH_TOKEN: ${{ secrets.BUS_INFRA_TOKEN }}   # read-only, bus-infra contents
           BUILD_ARGS: ${{ inputs.build_args }}
           BUILD_ARGS_SECRET: ${{ secrets.BUILD_ARGS }}
           ARTIFACT: ${{ inputs.apk_path }}
@@ -166,6 +168,7 @@ jobs:
         env:
           APP_DIR: ${{ inputs.source_repo != '' && format('src/{0}', inputs.app_dir) || inputs.app_dir }}
           BUILD_COMMAND: ${{ inputs.ios_build }}
+          GH_TOKEN: ${{ secrets.BUS_INFRA_TOKEN }}   # read-only, bus-infra contents
           BUILD_ARGS: ${{ inputs.build_args }}
           BUILD_ARGS_SECRET: ${{ secrets.BUILD_ARGS }}
           ARTIFACT: ${{ inputs.ios_app_path }}
